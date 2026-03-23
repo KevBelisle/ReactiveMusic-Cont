@@ -2,6 +2,7 @@ package circuitlord.reactivemusic.forge;
 
 import circuitlord.reactivemusic.ReactiveMusic;
 import circuitlord.reactivemusic.SongPicker;
+import circuitlord.reactivemusic.compat.CompatUtils;
 import circuitlord.reactivemusic.config.ModConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.MinecraftClient;
@@ -10,6 +11,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -24,6 +27,13 @@ public class ReactiveMusicForge {
         ReactiveMusic.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         MinecraftForge.EVENT_BUS.register(this);
+
+        ModLoadingContext.get().registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (mc, parent) -> CompatUtils.isYACLLoaded() ? ModConfig.createScreen(parent) : parent
+                )
+        );
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {

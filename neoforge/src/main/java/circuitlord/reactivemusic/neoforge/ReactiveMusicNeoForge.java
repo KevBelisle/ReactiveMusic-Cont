@@ -2,14 +2,17 @@ package circuitlord.reactivemusic.neoforge;
 
 import circuitlord.reactivemusic.ReactiveMusic;
 import circuitlord.reactivemusic.SongPicker;
+import circuitlord.reactivemusic.compat.CompatUtils;
 import circuitlord.reactivemusic.config.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -22,6 +25,11 @@ public class ReactiveMusicNeoForge {
         ReactiveMusic.init();
         modEventBus.addListener(this::onClientSetup);
         NeoForge.EVENT_BUS.register(this);
+
+        ModLoadingContext.get().registerExtensionPoint(
+                IConfigScreenFactory.class,
+                () -> (modContainer, parent) -> CompatUtils.isYACLLoaded() ? ModConfig.createScreen(parent) : parent
+        );
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {
