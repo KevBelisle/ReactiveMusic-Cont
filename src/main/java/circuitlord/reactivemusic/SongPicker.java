@@ -4,7 +4,7 @@ package circuitlord.reactivemusic;
 import circuitlord.reactivemusic.config.ModConfig;
 import circuitlord.reactivemusic.entries.RMRuntimeEntry;
 import circuitlord.reactivemusic.mixin.BossBarHudAccessor;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags;
+import circuitlord.reactivemusic.platform.BiomeTagHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.CreditsScreen;
@@ -61,7 +61,7 @@ public final class SongPicker {
 
     private static List<String> recentlyPickedSongs = new ArrayList<>();
 
-    public static final Field[] BIOME_TAG_FIELDS = ConventionalBiomeTags.class.getDeclaredFields();
+    public static final Field[] BIOME_TAG_FIELDS = BiomeTagHelper.INSTANCE.getBiomeTagFields();
     public static final List<TagKey<Biome>> BIOME_TAGS = new ArrayList<>();
 
     public static Long TIME_FOR_FORGET_DAMAGE_SOURCE = 200L;
@@ -137,7 +137,11 @@ public final class SongPicker {
 
         // TODO: someone help me I have no idea how to get the name of the world/server but if you know how then put it instead of "saved"
         if (!wasSleeping && player.isSleeping()) {
-            ReactiveMusic.config.savedHomePositions.put("saved", player.getEntityPos());
+            //? if >=1.21.9 {
+            /*ReactiveMusic.config.savedHomePositions.put("saved", player.getEntityPos());
+            *///?} else {
+            ReactiveMusic.config.savedHomePositions.put("saved", player.getPos());
+            //?}
 
             ModConfig.saveConfig();
         }
@@ -149,7 +153,11 @@ public final class SongPicker {
 
         if (ReactiveMusic.config.savedHomePositions.containsKey("saved")) {
 
-            Vec3d dist = player.getEntityPos().subtract(ReactiveMusic.config.savedHomePositions.get("saved"));
+            //? if >=1.21.9 {
+            /*Vec3d dist = player.getEntityPos().subtract(ReactiveMusic.config.savedHomePositions.get("saved"));
+            *///?} else {
+            Vec3d dist = player.getPos().subtract(ReactiveMusic.config.savedHomePositions.get("saved"));
+            //?}
 
             songpackEventMap.put(SongpackEventType.HOME, dist.length() < 45.0f);
         }
@@ -189,8 +197,13 @@ public final class SongPicker {
         songpackEventMap.put(SongpackEventType.UNDERWATER, player.isSubmergedInWater());
 
         // Weather
-        songpackEventMap.put(SongpackEventType.RAIN, world.isRaining() && biome.value().getPrecipitation(playerPos, world.getSeaLevel()) == Biome.Precipitation.RAIN);
+        //? if >=1.21.9 {
+        /*songpackEventMap.put(SongpackEventType.RAIN, world.isRaining() && biome.value().getPrecipitation(playerPos, world.getSeaLevel()) == Biome.Precipitation.RAIN);
         songpackEventMap.put(SongpackEventType.SNOW, world.isRaining() && biome.value().getPrecipitation(playerPos, world.getSeaLevel()) == Biome.Precipitation.SNOW);
+        *///?} else {
+        songpackEventMap.put(SongpackEventType.RAIN, world.isRaining() && biome.value().getPrecipitation(playerPos) == Biome.Precipitation.RAIN);
+        songpackEventMap.put(SongpackEventType.SNOW, world.isRaining() && biome.value().getPrecipitation(playerPos) == Biome.Precipitation.SNOW);
+        //?}
 
         songpackEventMap.put(SongpackEventType.STORM, world.isThundering());
 

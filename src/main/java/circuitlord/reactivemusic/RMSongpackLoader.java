@@ -1,7 +1,7 @@
 package circuitlord.reactivemusic;
 
 import circuitlord.reactivemusic.entries.RMRuntimeEntry;
-import net.fabricmc.loader.api.FabricLoader;
+import circuitlord.reactivemusic.platform.PlatformHelper;
 import org.rm_yaml.snakeyaml.Yaml;
 import org.rm_yaml.snakeyaml.constructor.Constructor;
 
@@ -73,7 +73,7 @@ public class RMSongpackLoader {
         availableSongpacks.add(loadSongpack(null, true, "ReactiveMusic.yaml"));
 
         // Load user songpacks
-        Path resourcePacksPath = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
+        Path resourcePacksPath = PlatformHelper.INSTANCE.getGameDir().resolve("resourcepacks");
         List<Path> potentialPacks = new ArrayList<>();
 
         try {

@@ -4,20 +4,9 @@ import circuitlord.reactivemusic.config.ModConfig;
 import circuitlord.reactivemusic.config.MusicDelayLength;
 import circuitlord.reactivemusic.config.MusicSwitchSpeed;
 import circuitlord.reactivemusic.entries.RMRuntimeEntry;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
@@ -29,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ReactiveMusic implements ModInitializer {
+public class ReactiveMusic {
 
-	public static final String MOD_ID = "reactive_music";
+	public static final String MOD_ID = "reactivemusic";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -92,53 +81,21 @@ public class ReactiveMusic implements ModInitializer {
 	public static final List<SoundInstance> trackedSoundsMuteMusic = new ArrayList<SoundInstance>();
 
 
-    public static MinecraftServer server;
+    // Server reference removed - was unused placeholder code
 
 
     public static boolean chatLoggingEnabled = false;
 
 
-	@Override
-	public void onInitialize() {
-
+	public static void init() {
 		LOGGER.info("Initializing Reactive Music...");
 
 		ModConfig.GSON.load();
 		config = ModConfig.getConfig();
+	}
 
-
-
-        if (FabricLoader.getInstance().getEnvironmentType().equals(EnvType.SERVER)) {
-
-
-            ServerLifecycleEvents.SERVER_STARTED.register(newServer -> {
-
-                server = newServer;
-
-
-
-                for (ServerPlayerEntity player : PlayerLookup.all(server)) {
-
-                }
-            });
-
-
-
-/*
-            for (ServerPlayerEntity player : PlayerLookup.world((ServerWorld) world)) {
-                ServerPlayNetworking.send(player, payload);
-            }
-*/
-
-            return;
-
-        }
-
-
-
-
+	public static void initClient() {
 		SongPicker.initialize();
-
 
 		thread = new PlayerThread();
 
@@ -172,90 +129,6 @@ public class ReactiveMusic implements ModInitializer {
 				setActiveSongpack(RMSongpackLoader.availableSongpacks.get(0));
 			}
 		}
-
-
-
-
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("reactivemusic")
-				.executes(context -> {
-							MinecraftClient mc = context.getSource().getClient();
-							Screen screen = ModConfig.createScreen(mc.currentScreen);
-							mc.send(() -> mc.setScreen(screen));
-							return 1;
-						}
-				)
-
-
-				.then(ClientCommandManager.literal("logBlockCounter")
-						.executes(context -> {
-
-							SongPicker.queuedToPrintBlockCounter = true;
-
-							return 1;
-						})
-				)
-
-                .then(ClientCommandManager.literal("toggleSoundEventLogging")
-                        .executes(context -> {
-
-                            printSoundEvents = !printSoundEvents;
-
-                            return 1;
-                        })
-                )
-
-				.then(ClientCommandManager.literal("blacklistDimension")
-						.executes(context -> {
-
-							String key = context.getSource().getClient().world.getRegistryKey().getValue().toString();
-
-							if (config.blacklistedDimensions.contains(key)) {
-								context.getSource().sendFeedback(Text.literal("[ReactiveMusic]: " + key + " was already in blacklist."));
-								return 1;
-							}
-
-							context.getSource().sendFeedback(Text.literal("[ReactiveMusic]: Added " + key + " to blacklist."));
-
-							config.blacklistedDimensions.add(key);
-							ModConfig.saveConfig();
-
-							return 1;
-						})
-				)
-
-				.then(ClientCommandManager.literal("unblacklistDimension")
-						.executes(context -> {
-							String key = context.getSource().getClient().world.getRegistryKey().getValue().toString();
-
-							if (!config.blacklistedDimensions.contains(key)) {
-								context.getSource().sendFeedback(Text.literal("[ReactiveMusic]: " + key + " was not in blacklist."));
-								return 1;
-							}
-
-							context.getSource().sendFeedback(Text.literal("[ReactiveMusic]: Removed " + key + " from blacklist."));
-
-							config.blacklistedDimensions.remove(key);
-							ModConfig.saveConfig();
-
-							return 1;
-						})
-				)
-
-                .then(ClientCommandManager.literal("toggleLogging")
-                        .executes(context -> {
-
-                            chatLoggingEnabled = !chatLoggingEnabled;
-
-                            context.getSource().sendFeedback(Text.literal("[ReactiveMusic]: Logging enabled: " + chatLoggingEnabled));
-
-                            return 1;
-                        })
-                )
-
-
-
-			)
-		);
 	}
 
 	public static void newTick() {
@@ -707,7 +580,11 @@ public class ReactiveMusic implements ModInitializer {
 				Vec3d pos = new Vec3d(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
 
 				if (MinecraftClient.getInstance().player != null) {
-					Vec3d dist = MinecraftClient.getInstance().player.getEntityPos().subtract(pos);
+					//? if >=1.21.9 {
+					/*Vec3d dist = MinecraftClient.getInstance().player.getEntityPos().subtract(pos);
+					*///?} else {
+					Vec3d dist = MinecraftClient.getInstance().player.getPos().subtract(pos);
+					//?}
 
 					if (dist.length() > 65.f) {
 						continue;
