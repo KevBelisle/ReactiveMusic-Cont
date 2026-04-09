@@ -50,6 +50,9 @@ dependencies {
     modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_forge")}") {
         exclude(group = "net.fabricmc.fabric-api")
     }
+    // YACL bundles quilt-parsers via JarJar which isn't loaded in dev, so add explicitly
+    forgeRuntimeLibrary("org.quiltmc.parsers:gson:0.2.1")
+    forgeRuntimeLibrary("org.quiltmc.parsers:json:0.2.1")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
     shadowBundle(project(common.path, "transformProductionForge")) { isTransitive = false }

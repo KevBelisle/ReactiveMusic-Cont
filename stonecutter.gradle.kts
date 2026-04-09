@@ -24,12 +24,29 @@ for (it in stonecutter.tree.branches) {
 }
 
 // Runs active versions for each loader
-for (it in stonecutter.tree.nodes) {
-    if (it.metadata != stonecutter.current || it.branch.id.isEmpty()) continue
+// For branches where the active version exists, use a simple dependsOn.
+// For branches where it doesn't (e.g. Forge only has 1.20.1 but active is 1.21.1),
+// use a chiseled task so Stonecutter properly sets up sources via chiseledSrc.
+for (branch in stonecutter.tree.branches) {
+    if (branch.id.isEmpty()) continue
+    val loader = branch.id.upperCaseFirst()
     val types = listOf("Client", "Server")
-    val loader = it.branch.id.upperCaseFirst()
-    for (type in types) tasks.register("runActive$type$loader") {
-        group = "project"
-        dependsOn("${it.hierarchy}run$type")
+
+    val activeNode = branch.nodes.find { it.metadata == stonecutter.current }
+    if (activeNode != null) {
+        // Active version exists in this branch — direct dependsOn works
+        for (type in types) tasks.register("runActive$type$loader") {
+            group = "project"
+            dependsOn("${activeNode.hierarchy}run$type")
+        }
+    } else {
+        // No active version in this branch — use chiseled tasks to set up sources
+        for (type in types) {
+            stonecutter registerChiseled tasks.register("runActive$type$loader", stonecutter.chiseled) {
+                group = "project"
+                versions { branchId, _ -> branchId == branch.id }
+                ofTask("run$type")
+            }
+        }
     }
 }
