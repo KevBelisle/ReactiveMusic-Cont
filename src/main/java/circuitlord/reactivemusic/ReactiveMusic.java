@@ -107,11 +107,11 @@ public class ReactiveMusic {
 		if (!config.loadedUserSongpack.isEmpty()) {
 
 			for (var songpack : RMSongpackLoader.availableSongpacks) {
-				if (!songpack.config.name.equals(config.loadedUserSongpack)) continue;
-
 				// something is broken in this songpack, don't load it
-				if (songpack.blockLoading)
+				if (songpack.blockLoading || songpack.config == null)
 					continue;
+
+				if (!songpack.config.name.equals(config.loadedUserSongpack)) continue;
 
 				setActiveSongpack(songpack);
 				loadedUserSongpack = true;

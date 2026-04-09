@@ -171,6 +171,16 @@ public class RMSongpackLoader {
             ReactiveMusic.LOGGER.error("Failed to load properties! Embedded=" + embedded + " Exception:" + e.toString());
         }
 
+        // yaml.loadAs can return null for empty/invalid YAML without throwing
+        if (songpackZip.config == null) {
+            songpackZip.config = new SongpackConfig();
+            songpackZip.config.name = songpackPath != null ? songpackPath.getFileName().toString() : "Embedded";
+            songpackZip.errorString += "YAML config was empty or invalid.\n\n";
+            songpackZip.blockLoading = true;
+
+            ReactiveMusic.LOGGER.error("YAML config was null after parsing! Embedded=" + embedded);
+        }
+
         if (!Constructor.errorString.isEmpty()) {
             songpackZip.errorString += Constructor.errorString;
         }
