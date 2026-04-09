@@ -4,6 +4,9 @@ import circuitlord.reactivemusic.SongPicker;
 import circuitlord.reactivemusic.SongpackEntry;
 import circuitlord.reactivemusic.SongpackEventType;
 import circuitlord.reactivemusic.SongpackZip;
+import circuitlord.reactivemusic.platform.BiomeTagHelper;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,42 +115,18 @@ public class RMRuntimeEntry {
                 else if (eventSection.startsWith("biometag=")) {
 
                     String rawTagString = eventSection.substring(9);
-
-                    // convert to v2 biome tag
-                    String biomeTagName = cleanBiomeTagString(rawTagString);
-                    if (biomeTagName.isEmpty())
+                    if (rawTagString.isEmpty())
                         continue;
 
-                    // Loop over all the cached tags and see if we have anything matching this
+                    String path = normalizeBiomeTagPath(rawTagString);
+                    TagKey<Biome> biomeTag = BiomeTagHelper.INSTANCE.createBiomeTagKey(path);
 
-                    boolean foundMatch = false;
-
-                    for (int k = 0; k < SongPicker.BIOME_TAG_FIELDS.length; k++) {
-
-                        // i love creating GC
-                        String fieldName = SongPicker.BIOME_TAG_FIELDS[k].getName();
-
-                        // convert our cached field tag to the v2 format (even with v1) since we did the same for the loaded one
-                        fieldName = cleanBiomeTagString(fieldName);
-
-                        if (fieldName.equals(biomeTagName)) {
-
-                            var biomeTag = SongPicker.getBiomeTagFromField(SongPicker.BIOME_TAG_FIELDS[k]);
-
-                            if (biomeTag != null) {
-                                // We found a match, now put the biometag key into the condition so we can use it later
-                                condition.biomeTags.add(biomeTag);
-                                eventHasData = true;
-
-                                foundMatch = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // we didn't find a match
-                    if (!foundMatch) {
-                        Entry.errorString += "Didn't find biometag with name: " + rawTagString + "!\n\n";
+                    if (biomeTag != null) {
+                        condition.biomeTags.add(biomeTag);
+                        SongPicker.registerBiomeTag(biomeTag);
+                        eventHasData = true;
+                    } else {
+                        Entry.errorString += "Biome tag '" + rawTagString + "' is not available on this platform!\n\n";
                     }
 
                 }
@@ -196,21 +175,15 @@ public class RMRuntimeEntry {
     }
 
 
-    public static String cleanBiomeTagString(String input) {
-        input = input.toLowerCase();
-
-        // handle cases where the start of the tag changed
-        input = input.replace("is_", "");
-        input = input.replace("in_", "");
-        input = input.replace("climate_", "");
-
-        // converting to 1.21 format with biometag v2
-
-
-        input = input.replace("tree_coniferous", "coniferous_tree");
-
-        return input;
-
+    public static String normalizeBiomeTagPath(String input) {
+        String path = input.toLowerCase().trim();
+        // Tags that don't start with a known prefix get "is_" prepended
+        // This handles backward compat: "WASTELAND" -> "is_wasteland", "HOT" -> "is_hot"
+        if (!path.startsWith("is_") && !path.startsWith("has_") && !path.startsWith("no_default_")
+                && !path.startsWith("hidden_from_")) {
+            path = "is_" + path;
+        }
+        return path;
     }
 
 
