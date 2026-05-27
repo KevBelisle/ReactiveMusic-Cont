@@ -2,14 +2,14 @@
 	"schemaVersion": 1,
 	"id": "reactivemusic",
 	"version": "${version}",
-	"name": "Reactive Music",
+	"name": "Reactive Music Cont",
 	"description": "Refactors Minecraft's music to be dynamic and reactive, including new fantasy and celtic tracks to give an air of adventure.",
 	"authors": [
 		"CircuitLord"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/reactive-music",
-		"sources": "https://github.com/CircuitLord/ReactiveMusic"
+		"homepage": "https://github.com/KevBelisle/ReactiveMusic-Cont",
+		"sources": "https://github.com/KevBelisle/ReactiveMusic-Cont"
 	},
 	"license": "GPLv3",
 	"icon": "assets/reactivemusic/icon.png",
