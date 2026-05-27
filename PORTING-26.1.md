@@ -9,6 +9,10 @@
 >
 > Current state: targets **1.21.9** on **Yarn**, Loom `1.11-SNAPSHOT`, Loader
 > `0.17.3`, Fabric API `0.134.0+1.21.9`, Gradle `8.14`, Java 21.
+>
+> **Versions resolved 2026-05-26:** loader `0.19.2`, loom `1.16-SNAPSHOT`,
+> fabric-api `0.149.1+26.1.2`, modmenu `18.0.0-beta.1` (beta — no stable yet),
+> yacl `3.9.3+26.1-fabric` (Modrinth-only; see §2 and §4.3 for repo change).
 
 This plan was cross-checked against the official Fabric sources (fetched from
 GitHub raw, since the rendered docs host was blocked here):
@@ -48,30 +52,40 @@ Do it in **two phases** (Fabric's recommended order):
 
 ---
 
-## 2. Version coordinates to look up FIRST (blocked here — all 403)
+## 2. Version coordinates (resolved 2026-05-26)
 
-Fill these from https://fabricmc.net/develop/ and the maven metadata, and
-sanity-check against the 26.1 example mod's `build.gradle`/`gradle.properties`.
+Looked up from maven metadata and cross-checked against the official 26.1
+example mod's `build.gradle`/`gradle.properties`.
 
 | Coordinate | Current | 26.1 value |
 |---|---|---|
-| `minecraft_version` | 1.21.9 | `26.1` (confirm exact string; patch builds 26.1.x exist) |
+| `minecraft_version` | 1.21.9 | `26.1` (patch releases exist as `26.1.1`, `26.1.2`; use `>=26.1 <26.2` in fabric.mod.json) |
 | Loom plugin id | `fabric-loom` | **`net.fabricmc.fabric-loom`** (confirmed) |
-| `loom_version` | 1.11-SNAPSHOT | `1.15.x` (Loom 1.15) — confirm exact |
-| `loader_version` | 0.17.3 | `0.18.4` (or newer stable) |
-| `fabric_version` (Fabric API) | 0.134.0+1.21.9 | the published `…+26.1` build — **LOOK UP** |
+| `loom_version` | 1.11-SNAPSHOT | **`1.16-SNAPSHOT`** (confirmed from example mod) |
+| `loader_version` | 0.17.3 | **`0.19.2`** (latest stable as of 2026-05-26) |
+| `fabric_version` (Fabric API) | 0.134.0+1.21.9 | **`0.149.1+26.1.2`** (latest stable for 26.1.x as of 2026-05-26) |
 | Gradle | 8.14 | `9.4.x` — set via `./gradlew wrapper --gradle-version latest` |
 | Java | 21 | **25** (confirmed) |
-| `modmenu_version` | 16.0.0-rc.1 | 26.1 build — **LOOK UP** |
-| `yacl_version` | 3.8.0+1.21.9-fabric | 26.1 build — **LOOK UP**; confirm artifact + mod id `yet_another_config_lib_v3` unchanged |
+| `modmenu_version` | 16.0.0-rc.1 | **`18.0.0-beta.1`** ⚠️ beta only — no stable 26.1 release yet |
+| `yacl_version` | 3.8.0+1.21.9-fabric | **`3.9.3+26.1-fabric`** ⚠️ Modrinth-only; see §4.3 repo change |
 
-Lookups once network is available:
+**⚠️ YACL maven repository change:** `3.9.3+26.1-fabric` is published to
+**Modrinth only** — it is NOT on `maven.isxander.dev/releases`. In `build.gradle`
+replace the isxander repository with the Modrinth maven and change the YACL
+dependency coordinate:
+```groovy
+// repositories block
+maven { url "https://api.modrinth.com/maven" }
+
+// dependencies block
+implementation("maven.modrinth:yacl:${project.yacl_version}") {
+    exclude(group: "net.fabricmc.fabric-api")
+}
 ```
-curl -s https://maven.fabricmc.net/net/fabricmc/fabric-loader/maven-metadata.xml
-curl -s https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml
-curl -s https://maven.terraformersmc.com/releases/com/terraformersmc/modmenu/maven-metadata.xml
-curl -s https://maven.isxander.dev/releases/dev/isxander/yet-another-config-lib-fabric/maven-metadata.xml
-```
+The group changes from `dev.isxander` to `maven.modrinth`; artifact id changes
+from `yet-another-config-lib` to `yacl` (the Modrinth slug). The exclude clause
+stays. Verify the Modrinth maven URL with:
+`curl -s -o /dev/null -w "%{http_code}" "https://api.modrinth.com/maven/maven/modrinth/yacl/3.9.3+26.1-fabric/yacl-3.9.3+26.1-fabric.pom"` — returns 200.
 
 You also need **JDK 25** installed and **IntelliJ IDEA 2025.3+** (for Java 25
 support and the Migrate refactoring).
@@ -118,24 +132,24 @@ manual edit:
 distributionUrl=https\://services.gradle.org/distributions/gradle-9.4.0-bin.zip
 ```
 
-### 4.2 `gradle.properties` (fill bracketed values from §2)
+### 4.2 `gradle.properties`
 ```properties
 org.gradle.jvmargs=-Xmx8G
 org.gradle.parallel=true
 
 # https://fabricmc.net/develop
 minecraft_version=26.1
-loader_version=0.18.4
-loom_version=1.15-SNAPSHOT        # confirm exact
+loader_version=0.19.2
+loom_version=1.16-SNAPSHOT
 
-fabric_version=<LOOK UP +26.1>
+fabric_version=0.149.1+26.1.2
 
 mod_version=1.3.0                  # bump from 1.2.2
 maven_group=circuitlord.reactivemusic
 archives_base_name=reactivemusic
 
-modmenu_version=<LOOK UP 26.1>
-yacl_version=<LOOK UP 26.1>
+modmenu_version=18.0.0-beta.1
+yacl_version=3.9.3+26.1-fabric
 ```
 > The `yarn_mappings` property is removed.
 
@@ -156,7 +170,10 @@ yacl_version=<LOOK UP 26.1>
    JavaVersion.VERSION_25`; `targetCompatibility = JavaVersion.VERSION_25`.
 6. Keep `processResources` `fabric.mod.json` `expand version`, the `jar`
    LICENSE rename, `withSourcesJar()`, and publishing as-is.
-7. Repos: keep TerraformersMC + Xander maven; confirm YACL group/artifact.
+7. Repos: keep TerraformersMC maven (for ModMenu); **replace** the Xander maven
+   (`maven.isxander.dev/releases`) with the Modrinth maven
+   (`https://api.modrinth.com/maven`) — YACL 3.9.x 26.1 builds are Modrinth-only.
+   See the full dependency snippet in §2.
 > Compare the final result with the 26.1 example mod's `build.gradle`.
 
 ### 4.4 `settings.gradle`
@@ -170,7 +187,7 @@ sufficient. If you ever pin the Loom plugin id here, use
   "fabricloader": ">=0.18.4",
   "minecraft": ">=26.1 <26.2",       // confirm predicate syntax; include 26.1.x patches you support
   "java": ">=25",
-  "yet_another_config_lib_v3": "*"   // confirm mod id unchanged for 26.1 YACL
+  "yet_another_config_lib_v3": "*"   // confirmed unchanged (YACL gradle.properties: modId=yet_another_config_lib_v3)
 }
 ```
 
