@@ -191,7 +191,7 @@ public class ReactiveMusic implements ModInitializer {
 				.then(ClientCommands.literal("blacklistDimension")
 						.executes(context -> {
 
-							String key = context.getSource().getClient().level.dimension().location().toString();
+							String key = context.getSource().getClient().level.dimension().identifier().toString();
 
 							if (config.blacklistedDimensions.contains(key)) {
 								context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: " + key + " was already in blacklist."));
@@ -209,7 +209,7 @@ public class ReactiveMusic implements ModInitializer {
 
 				.then(ClientCommands.literal("unblacklistDimension")
 						.executes(context -> {
-							String key = context.getSource().getClient().level.dimension().location().toString();
+							String key = context.getSource().getClient().level.dimension().identifier().toString();
 
 							if (!config.blacklistedDimensions.contains(key)) {
 								context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: " + key + " was not in blacklist."));
@@ -277,7 +277,7 @@ public class ReactiveMusic implements ModInitializer {
 
 			// see if the dimension we're in is blacklisted -- update at same time as event map to keep them in sync
 			if (mc.level != null) {
-				String curDim = mc.level.dimension().location().toString();
+				String curDim = mc.level.dimension().identifier().toString();
 
 				for (String dim : config.blacklistedDimensions) {
 					if (dim.equals(curDim)) {

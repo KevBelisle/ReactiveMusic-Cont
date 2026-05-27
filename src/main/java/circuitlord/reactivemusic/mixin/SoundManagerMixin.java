@@ -17,7 +17,7 @@ public class SoundManagerMixin {
     @Inject(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;", at = @At("HEAD"), cancellable = true)
     private void play(SoundInstance soundInstance, CallbackInfoReturnable<SoundEngine.PlayResult> cir) {
 
-        String path = soundInstance.getLocation().getPath();
+        String path = soundInstance.getIdentifier().getPath();
 
 
         Minecraft mc = Minecraft.getInstance();

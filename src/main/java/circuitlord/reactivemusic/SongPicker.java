@@ -12,12 +12,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.Pig;
-import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -114,13 +114,13 @@ public final class SongPicker {
 
         // Copied logic out from getIdAsString
         currentBiomeName = (String)biome.unwrapKey().map((key) -> {
-            return key.location().toString();
+            return key.identifier().toString();
         }).orElse("[unregistered]");
 
         boolean underground = !world.canSeeSky(playerPos);
         var indimension = world.dimension();
 
-        currentDimName = indimension.location().toString();
+        currentDimName = indimension.identifier().toString();
 
         Entity riding = VersionHelper.GetRidingEntity(player);
 
@@ -338,7 +338,7 @@ public final class SongPicker {
 
 
                 var block = world.getBlockState(mutablePos).getBlock();
-                String key = BuiltInRegistries.BLOCK.getKey(block).location().toString();
+                String key = BuiltInRegistries.BLOCK.getKey(block).toString();
 
                 boolean isBlacklisted = false;
                 for (String black : BLOCK_COUNTER_BLACKLIST) {
