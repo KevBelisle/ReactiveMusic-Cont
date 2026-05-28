@@ -1,0 +1,173 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Release channel"
+        type: choice
+        options:
+          - release
+          - beta
+          - alpha
+        default: release
+      publish_modrinth:
+        description: "Publish to Modrinth"
+        type: boolean
+        default: true
+      publish_curseforge:
+        description: "Publish to CurseForge"
+        type: boolean
+        default: true
+      changelog:
+        description: "Release notes. Leave blank for a generated default."
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish ${{ matrix.loader }} ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - loader: fabric
+            mc: 1.20.1
+            game_versions: ">=1.20 <=1.20.1"
+            java: 17
+          - loader: forge
+            mc: 1.20.1
+            game_versions: ">=1.20 <=1.20.1"
+            java: 17
+          - loader: fabric
+            mc: 1.21.1
+            game_versions: ">=1.21 <=1.21.1"
+            java: 21
+          - loader: neoforge
+            mc: 1.21.1
+            game_versions: ">=1.21 <=1.21.1"
+            java: 21
+          - loader: fabric
+            mc: 1.21.11
+            game_versions: ">=1.21.9 <=1.21.12"
+            java: 21
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          CHANGELOG_TEXT: ${{ inputs.changelog }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+
+          mod_version="$(grep '^mod.version=' gradle.properties | cut -d= -f2-)"
+          modrinth_project="${MODRINTH_PROJECT_ID:-reactive-music}"
+          curseforge_project="${CURSEFORGE_PROJECT_ID:-}"
+
+          mkdir -p build
+          if [ -n "$CHANGELOG_TEXT" ]; then
+            printf '%s\n' "$CHANGELOG_TEXT" > build/release-changelog.md
+          elif [ -f CHANGELOG.md ]; then
+            cp CHANGELOG.md build/release-changelog.md
+          else
+            printf 'Reactive Music %s for Minecraft %s (%s).\n' "$mod_version" "${{ matrix.mc }}" "${{ matrix.loader }}" > build/release-changelog.md
+          fi
+
+          echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
+          echo "modrinth_project=$modrinth_project" >> "$GITHUB_OUTPUT"
+          echo "curseforge_project=$curseforge_project" >> "$GITHUB_OUTPUT"
+
+      - name: Validate publishing credentials
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ steps.meta.outputs.curseforge_project }}
+        run: |
+          set -euo pipefail
+
+          if [ "${{ inputs.publish_modrinth }}" = "true" ] && [ -z "$MODRINTH_TOKEN" ]; then
+            echo "MODRINTH_TOKEN secret is required when publish_modrinth is enabled." >&2
+            exit 1
+          fi
+
+          if [ "${{ inputs.publish_curseforge }}" = "true" ]; then
+            if [ -z "$CURSEFORGE_TOKEN" ]; then
+              echo "CURSEFORGE_TOKEN secret is required when publish_curseforge is enabled." >&2
+              exit 1
+            fi
+            if [ -z "$CURSEFORGE_PROJECT_ID" ]; then
+              echo "CURSEFORGE_PROJECT_ID repository variable is required when publish_curseforge is enabled." >&2
+              exit 1
+            fi
+          fi
+
+      - name: Build all jars
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon chiseledBuild
+
+      - name: Publish to Modrinth
+        if: ${{ inputs.publish_modrinth }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ steps.meta.outputs.modrinth_project }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          files: build/libs/${{ steps.meta.outputs.mod_version }}/${{ matrix.loader }}/reactivemusic-${{ matrix.loader }}-${{ steps.meta.outputs.mod_version }}+${{ matrix.mc }}.jar
+          name: Reactive Music ${{ steps.meta.outputs.mod_version }} for Minecraft ${{ matrix.mc }} (${{ matrix.loader }})
+          version: ${{ steps.meta.outputs.mod_version }}+${{ matrix.mc }}-${{ matrix.loader }}
+          version-type: ${{ inputs.version_type }}
+          changelog-file: build/release-changelog.md
+
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ matrix.game_versions }}
+          game-version-filter: none
+          java: ${{ matrix.java }}
+
+          retry-attempts: 2
+          retry-delay: 10000
+          fail-mode: fail
+
+      - name: Publish to CurseForge
+        if: ${{ inputs.publish_curseforge }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: ${{ steps.meta.outputs.curseforge_project }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          files: build/libs/${{ steps.meta.outputs.mod_version }}/${{ matrix.loader }}/reactivemusic-${{ matrix.loader }}-${{ steps.meta.outputs.mod_version }}+${{ matrix.mc }}.jar
+          name: Reactive Music ${{ steps.meta.outputs.mod_version }} for Minecraft ${{ matrix.mc }} (${{ matrix.loader }})
+          version: ${{ steps.meta.outputs.mod_version }}+${{ matrix.mc }}-${{ matrix.loader }}
+          version-type: ${{ inputs.version_type }}
+          changelog-file: build/release-changelog.md
+
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ matrix.game_versions }}
+          game-version-filter: none
+          java: ${{ matrix.java }}
+
+          retry-attempts: 2
+          retry-delay: 10000
+          fail-mode: fail
