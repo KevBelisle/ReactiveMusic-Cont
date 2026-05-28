@@ -19,9 +19,7 @@ public class SoundManagerMixin {
 
         String path = soundInstance.getIdentifier().getPath();
 
-
         Minecraft mc = Minecraft.getInstance();
-
 
         if (mc.player != null && ReactiveMusic.printSoundEvents) {
             mc.player.sendSystemMessage(Component.literal("[ReactiveMusic]: Sound: " + path + " Attenuation: " + soundInstance.getAttenuation()));
@@ -41,15 +39,11 @@ public class SoundManagerMixin {
             ReactiveMusic.LOGGER.info("Detected cobblemon battle event, adding to list!");
         }
 
-
         for (String muteSound : ReactiveMusic.config.soundsMuteMusic) {
             if (path.contains(muteSound)) {
                 ReactiveMusic.trackedSoundsMuteMusic.add(soundInstance);
                 break;
             }
         }
-
-
     }
-
 }

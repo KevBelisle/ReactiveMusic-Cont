@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\(gradle|properties|json\\)$\")",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew :common:build)",
+      "Bash(java:*)",
+      "Bash(./gradlew --version)",
+      "WebFetch(domain:maven.isxander.dev)",
+      "WebFetch(domain:maven.architectury.dev)",
+      "WebFetch(domain:maven.neoforged.net)",
+      "Bash(./gradlew :common:compileJava)",
+      "Bash(jar tf:*)",
+      "Bash(./gradlew :fabric:compileJava)",
+      "Bash(./gradlew :neoforge:compileJava)",
+      "Bash(./gradlew :neoforge:dependencies --configuration compileClasspath)",
+      "Bash(./gradlew :neoforge:dependencies)",
+      "Bash(xargs -I {} basename {})",
+      "WebSearch",
+      "WebFetch(domain:stonecutter.kikugie.dev)",
+      "WebFetch(domain:template.txni.dev)",
+      "WebFetch(domain:stonecraft.meza.gg)",
+      "WebFetch(domain:docs.isxander.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(./gradlew --no-daemon --stacktrace tasks --group project)",
+      "Bash(./gradlew --no-daemon --stacktrace projects)",
+      "Bash(./gradlew --no-daemon projects)",
+      "WebFetch(domain:projects.neoforged.net)",
+      "Bash(./gradlew:*)",
+      "Bash(curl -s https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml)",
+      "WebFetch(domain:maven.fabricmc.net)",
+      "WebFetch(domain:maven.terraformersmc.com)",
+      "WebFetch(domain:api.modrinth.com)"
+    ]
+  }
+}

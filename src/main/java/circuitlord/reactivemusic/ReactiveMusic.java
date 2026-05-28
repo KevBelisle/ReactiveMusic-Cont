@@ -4,21 +4,10 @@ import circuitlord.reactivemusic.config.ModConfig;
 import circuitlord.reactivemusic.config.MusicDelayLength;
 import circuitlord.reactivemusic.config.MusicSwitchSpeed;
 import circuitlord.reactivemusic.entries.RMRuntimeEntry;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.Options;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -29,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ReactiveMusic implements ModInitializer {
+public class ReactiveMusic {
 
-	public static final String MOD_ID = "reactive_music";
+	public static final String MOD_ID = "reactivemusic";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -82,47 +71,18 @@ public class ReactiveMusic implements ModInitializer {
 	public static final List<SoundInstance> trackedSoundsMuteMusic = new ArrayList<SoundInstance>();
 
 
-    public static MinecraftServer server;
-
-
     public static boolean chatLoggingEnabled = false;
 
 
-	@Override
-	public void onInitialize() {
-
+	public static void init() {
 		LOGGER.info("Initializing Reactive Music...");
 
 		ModConfig.GSON.load();
 		config = ModConfig.getConfig();
+	}
 
-
-
-        if (FabricLoader.getInstance().getEnvironmentType().equals(EnvType.SERVER)) {
-
-
-            ServerLifecycleEvents.SERVER_STARTED.register(newServer -> {
-
-                server = newServer;
-
-
-
-                for (ServerPlayer player : PlayerLookup.all(server)) {
-
-                }
-            });
-
-
-
-            return;
-
-        }
-
-
-
-
+	public static void initClient() {
 		SongPicker.initialize();
-
 
 		thread = new PlayerThread();
 
@@ -134,11 +94,11 @@ public class ReactiveMusic implements ModInitializer {
 		if (!config.loadedUserSongpack.isEmpty()) {
 
 			for (var songpack : RMSongpackLoader.availableSongpacks) {
-				if (!songpack.config.name.equals(config.loadedUserSongpack)) continue;
-
 				// something is broken in this songpack, don't load it
-				if (songpack.blockLoading)
+				if (songpack.blockLoading || songpack.config == null)
 					continue;
+
+				if (!songpack.config.name.equals(config.loadedUserSongpack)) continue;
 
 				setActiveSongpack(songpack);
 				loadedUserSongpack = true;
@@ -156,90 +116,6 @@ public class ReactiveMusic implements ModInitializer {
 				setActiveSongpack(RMSongpackLoader.availableSongpacks.get(0));
 			}
 		}
-
-
-
-
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("reactivemusic")
-				.executes(context -> {
-							Minecraft mc = context.getSource().getClient();
-							Screen screen = ModConfig.createScreen(mc.screen);
-							mc.execute(() -> mc.setScreen(screen));
-							return 1;
-						}
-				)
-
-
-				.then(ClientCommands.literal("logBlockCounter")
-						.executes(context -> {
-
-							SongPicker.queuedToPrintBlockCounter = true;
-
-							return 1;
-						})
-				)
-
-                .then(ClientCommands.literal("toggleSoundEventLogging")
-                        .executes(context -> {
-
-                            printSoundEvents = !printSoundEvents;
-
-                            return 1;
-                        })
-                )
-
-				.then(ClientCommands.literal("blacklistDimension")
-						.executes(context -> {
-
-							String key = context.getSource().getClient().level.dimension().identifier().toString();
-
-							if (config.blacklistedDimensions.contains(key)) {
-								context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: " + key + " was already in blacklist."));
-								return 1;
-							}
-
-							context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: Added " + key + " to blacklist."));
-
-							config.blacklistedDimensions.add(key);
-							ModConfig.saveConfig();
-
-							return 1;
-						})
-				)
-
-				.then(ClientCommands.literal("unblacklistDimension")
-						.executes(context -> {
-							String key = context.getSource().getClient().level.dimension().identifier().toString();
-
-							if (!config.blacklistedDimensions.contains(key)) {
-								context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: " + key + " was not in blacklist."));
-								return 1;
-							}
-
-							context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: Removed " + key + " from blacklist."));
-
-							config.blacklistedDimensions.remove(key);
-							ModConfig.saveConfig();
-
-							return 1;
-						})
-				)
-
-                .then(ClientCommands.literal("toggleLogging")
-                        .executes(context -> {
-
-                            chatLoggingEnabled = !chatLoggingEnabled;
-
-                            context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: Logging enabled: " + chatLoggingEnabled));
-
-                            return 1;
-                        })
-                )
-
-
-
-			)
-		);
 	}
 
 	public static void newTick() {

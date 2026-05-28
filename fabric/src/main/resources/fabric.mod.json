@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "reactivemusic",
+	"id": "${id}",
 	"version": "${version}",
 	"name": "Reactive Music Cont",
 	"description": "Refactors Minecraft's music to be dynamic and reactive, including new fantasy and celtic tracks to give an air of adventure.",
@@ -15,21 +15,20 @@
 	"icon": "assets/reactivemusic/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"circuitlord.reactivemusic.ReactiveMusic"
+		"client": [
+			"circuitlord.reactivemusic.fabric.ReactiveMusicFabric"
 		],
 		"modmenu": [
-			"circuitlord.reactivemusic.compat.modmenu.ModMenuIntegration"
+			"circuitlord.reactivemusic.fabric.ModMenuIntegration"
 		]
 	},
 	"mixins": [
-		"reactivemusic.mixins.json"
+		"reactivemusic-common.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
 		"minecraft": ">=26.1 <26.2",
-		"java": ">=25",
-		"yet_another_config_lib_v3": "*"
+		"java": ">=25"
 	},
 	"custom": {
 		"modmenu": {

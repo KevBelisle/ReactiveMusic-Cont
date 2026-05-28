@@ -24,7 +24,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public final class SongPicker {
@@ -56,34 +55,14 @@ public final class SongPicker {
 
     private static List<String> recentlyPickedSongs = new ArrayList<>();
 
-    public static final Field[] BIOME_TAG_FIELDS = ConventionalBiomeTags.class.getDeclaredFields();
-    public static final List<TagKey<Biome>> BIOME_TAGS = new ArrayList<>();
-
     public static Long TIME_FOR_FORGET_DAMAGE_SOURCE = 200L;
 
     public static boolean wasSleeping = false;
 
-    static {
-
-        for (Field field : BIOME_TAG_FIELDS) {
-            TagKey<Biome> biomeTag = getBiomeTagFromField(field);
-
-            BIOME_TAGS.add(biomeTag);
-            biomeTagEventMap.put(biomeTag, false);
+    public static void registerBiomeTag(TagKey<Biome> tag) {
+        if (!biomeTagEventMap.containsKey(tag)) {
+            biomeTagEventMap.put(tag, false);
         }
-    }
-
-    public static TagKey<Biome> getBiomeTagFromField(Field field) {
-        if (field.getType() == TagKey.class) {
-            try {
-                @SuppressWarnings("unchecked")
-                TagKey<Biome> tag = (TagKey<Biome>) field.get(null);
-                return tag;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
 
@@ -192,13 +171,12 @@ public final class SongPicker {
 
         var currentTags = biome.tags().toList();
 
-        // Update all ConventionalBiomeTags
-        for (TagKey<Biome> tag : BIOME_TAGS) {
+        // Update all registered biome tags
+        for (TagKey<Biome> tag : biomeTagEventMap.keySet()) {
             boolean found = false;
 
-            // search by ID instead of comparing tagkey, doesn't work on non-fabric
             for (TagKey<Biome> curTag : currentTags) {
-                if (curTag.location() == tag.location()) {
+                if (curTag.location().equals(tag.location())) {
                     found = true;
                     break;
                 }
@@ -377,6 +355,7 @@ public final class SongPicker {
     public static void initialize() {
 
         songpackEventMap.clear();
+        biomeTagEventMap.clear();
 
         for (SongpackEventType eventType : SongpackEventType.values()) {
             songpackEventMap.put(eventType, false);
@@ -386,7 +365,7 @@ public final class SongPicker {
 
 
 
-    private static final List<SongpackEntry> reusableValidEntries = new ArrayList<>();
+
 
 
     static boolean hasSongNotPlayedRecently(List<String> songs) {
