@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "${loader}"
 license = "GPLv3"
 
 [[mods]]
@@ -14,7 +14,7 @@ displayURL = "https://modrinth.com/mod/reactive-music"
 [[dependencies.${id}]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "${loader}"
 ordering = "NONE"
 side = "CLIENT"
 

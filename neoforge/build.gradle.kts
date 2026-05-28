@@ -50,8 +50,10 @@ dependencies {
     })
     "neoForge"("net.neoforged:neoforge:${common.mod.dep("neoforge_loader")}")
 
-    modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_neoforge")}") {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (stonecutter.eval(minecraft, ">=1.20")) {
+        modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_neoforge")}") {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
     }
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
@@ -96,7 +98,8 @@ tasks.processResources {
         "id" to mod.id,
         "name" to mod.name,
         "version" to mod.version,
-        "minecraft" to common.mod.prop("mc_dep_forgelike")
+        "minecraft" to common.mod.prop("mc_dep_forgelike"),
+        "loader" to common.mod.prop("loader_dep_neoforge")
     )
 }
 

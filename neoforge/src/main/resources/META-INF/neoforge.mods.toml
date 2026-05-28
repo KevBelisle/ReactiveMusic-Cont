@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[4,)"
+loaderVersion = "${loader}"
 license = "GPLv3"
 
 [[mods]]
@@ -17,7 +17,7 @@ config = "reactivemusic-common.mixins.json"
 [[dependencies.${id}]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21,)"
+versionRange = "${loader}"
 ordering = "NONE"
 side = "CLIENT"
 

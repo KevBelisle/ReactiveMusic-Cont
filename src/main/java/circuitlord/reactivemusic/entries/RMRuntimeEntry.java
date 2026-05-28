@@ -5,7 +5,11 @@ import circuitlord.reactivemusic.SongpackEntry;
 import circuitlord.reactivemusic.SongpackEventType;
 import circuitlord.reactivemusic.SongpackZip;
 import circuitlord.reactivemusic.platform.BiomeTagHelper;
+//? if >=1.20 {
 import net.minecraft.registry.tag.TagKey;
+//?} else {
+/*import net.minecraft.tag.TagKey;
+*///?}
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;

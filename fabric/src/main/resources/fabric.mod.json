@@ -27,8 +27,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.15.0",
-		"minecraft": "${minecraft}",
-		"yet_another_config_lib_v3": "*"
+		"minecraft": "${minecraft}"${yacl_dependency}
 	},
 	"custom": {
 		"modmenu": {

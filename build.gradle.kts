@@ -27,8 +27,10 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
 
     // YACL - use fabric artifact as common dependency (per YACL docs)
-    modImplementation("dev.isxander:yet-another-config-lib:${mod.dep("yacl")}") {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (stonecutter.eval(minecraft, ">=1.20")) {
+        modImplementation("dev.isxander:yet-another-config-lib:${mod.dep("yacl")}") {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
     }
 }
 

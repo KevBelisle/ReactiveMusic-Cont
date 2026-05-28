@@ -48,8 +48,10 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${common.mod.dep("fabric_api")}")
 
-    modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl")}") {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (stonecutter.eval(minecraft, ">=1.20")) {
+        modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl")}") {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
     }
     modApi("com.terraformersmc:modmenu:${common.mod.dep("modmenu")}")
 
@@ -94,7 +96,8 @@ tasks.processResources {
         "id" to mod.id,
         "name" to mod.name,
         "version" to mod.version,
-        "minecraft" to common.mod.prop("mc_dep_fabric")
+        "minecraft" to common.mod.prop("mc_dep_fabric"),
+        "yacl_dependency" to if (stonecutter.eval(minecraft, ">=1.20")) ",\n\t\t\"yet_another_config_lib_v3\": \"*\"" else ""
     )
 }
 

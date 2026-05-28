@@ -150,8 +150,12 @@ public class ReactiveMusic {
 
 				LOGGER.info("Forcing master volume to a lower default, this will only happen once on mod-install to avoid loud defaults.");
 
+				//? if >=1.20 {
 				mc.options.getSoundVolumeOption(SoundCategory.MASTER).setValue(0.5);
 				mc.options.write();
+				//?} else {
+				/*mc.options.write();
+				*///?}
 			}
 		}
 

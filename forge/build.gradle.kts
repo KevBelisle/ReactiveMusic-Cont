@@ -47,12 +47,14 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraft+build.${common.mod.dep("yarn_build")}:v2")
     "forge"("net.minecraftforge:forge:$minecraft-${common.mod.dep("forge_loader")}")
 
-    modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_forge")}") {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (stonecutter.eval(minecraft, ">=1.20")) {
+        modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_forge")}") {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
+        // YACL bundles quilt-parsers via JarJar which isn't loaded in dev, so add explicitly
+        forgeRuntimeLibrary("org.quiltmc.parsers:gson:0.2.1")
+        forgeRuntimeLibrary("org.quiltmc.parsers:json:0.2.1")
     }
-    // YACL bundles quilt-parsers via JarJar which isn't loaded in dev, so add explicitly
-    forgeRuntimeLibrary("org.quiltmc.parsers:gson:0.2.1")
-    forgeRuntimeLibrary("org.quiltmc.parsers:json:0.2.1")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
     shadowBundle(project(common.path, "transformProductionForge")) { isTransitive = false }
@@ -101,7 +103,8 @@ tasks.processResources {
         "id" to mod.id,
         "name" to mod.name,
         "version" to mod.version,
-        "minecraft" to common.mod.prop("mc_dep_forgelike")
+        "minecraft" to common.mod.prop("mc_dep_forgelike"),
+        "loader" to common.mod.prop("loader_dep_forge")
     )
 }
 
