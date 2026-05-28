@@ -1,8 +1,8 @@
 package circuitlord.reactivemusic.entries;
 
 import circuitlord.reactivemusic.SongpackEventType;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
 import java.util.List;
