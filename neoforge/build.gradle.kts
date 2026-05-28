@@ -39,7 +39,6 @@ configurations {
 
 repositories {
     maven("https://maven.neoforged.net/releases/")
-    maven("https://maven.isxander.dev/releases") { name = "Xander Maven" }
 }
 
 dependencies {
@@ -49,12 +48,6 @@ dependencies {
         mappings("dev.architectury:yarn-mappings-patch-neoforge:${common.mod.dep("neoforge_patch")}")
     })
     "neoForge"("net.neoforged:neoforge:${common.mod.dep("neoforge_loader")}")
-
-    if (stonecutter.eval(minecraft, ">=1.20")) {
-        modImplementation("dev.isxander:yet-another-config-lib:${common.mod.dep("yacl_neoforge")}") {
-            exclude(group = "net.fabricmc.fabric-api")
-        }
-    }
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
     shadowBundle(project(common.path, "transformProductionNeoForge")) { isTransitive = false }

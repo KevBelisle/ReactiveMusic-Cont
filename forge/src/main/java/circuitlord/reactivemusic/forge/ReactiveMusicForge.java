@@ -2,7 +2,6 @@ package circuitlord.reactivemusic.forge;
 
 import circuitlord.reactivemusic.ReactiveMusic;
 import circuitlord.reactivemusic.SongPicker;
-import circuitlord.reactivemusic.compat.CompatUtils;
 import circuitlord.reactivemusic.config.ModConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.MinecraftClient;
@@ -31,7 +30,7 @@ public class ReactiveMusicForge {
         ModLoadingContext.get().registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(
-                        (mc, parent) -> CompatUtils.isYACLLoaded() ? ModConfig.createScreen(parent) : parent
+                        (mc, parent) -> ModConfig.createScreen(parent)
                 )
         );
     }

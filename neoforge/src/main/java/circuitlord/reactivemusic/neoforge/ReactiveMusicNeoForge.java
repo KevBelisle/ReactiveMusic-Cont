@@ -2,7 +2,6 @@ package circuitlord.reactivemusic.neoforge;
 
 import circuitlord.reactivemusic.ReactiveMusic;
 import circuitlord.reactivemusic.SongPicker;
-import circuitlord.reactivemusic.compat.CompatUtils;
 import circuitlord.reactivemusic.config.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,7 +27,7 @@ public class ReactiveMusicNeoForge {
 
         ModLoadingContext.get().registerExtensionPoint(
                 IConfigScreenFactory.class,
-                () -> (modContainer, parent) -> CompatUtils.isYACLLoaded() ? ModConfig.createScreen(parent) : parent
+                () -> (modContainer, parent) -> ModConfig.createScreen(parent)
         );
     }
 

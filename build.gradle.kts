@@ -17,7 +17,6 @@ architectury.common(stonecutter.tree.branches.mapNotNull {
 })
 
 repositories {
-    maven("https://maven.isxander.dev/releases") { name = "Xander Maven" }
     maven("https://maven.terraformersmc.com/releases/") { name = "Terraformers" }
 }
 
@@ -26,12 +25,6 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraft+build.${mod.dep("yarn_build")}:v2")
     modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
 
-    // YACL - use fabric artifact as common dependency (per YACL docs)
-    if (stonecutter.eval(minecraft, ">=1.20")) {
-        modImplementation("dev.isxander:yet-another-config-lib:${mod.dep("yacl")}") {
-            exclude(group = "net.fabricmc.fabric-api")
-        }
-    }
 }
 
 java {

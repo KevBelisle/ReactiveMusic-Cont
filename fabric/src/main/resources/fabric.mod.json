@@ -27,7 +27,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.15.0",
-		"minecraft": "${minecraft}"${yacl_dependency}
+		"minecraft": "${minecraft}"
 	},
 	"custom": {
 		"modmenu": {

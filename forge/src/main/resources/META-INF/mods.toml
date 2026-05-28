@@ -8,7 +8,7 @@ version = "${version}"
 displayName = "${name}"
 description = "Refactors Minecraft's music to be dynamic and reactive, including new fantasy and celtic tracks to give an air of adventure."
 authors = "CircuitLord"
-logoFile = "assets/reactivemusic/icon.png"
+logoFile = "icon.png"
 displayURL = "https://modrinth.com/mod/reactive-music"
 
 [[dependencies.${id}]]
