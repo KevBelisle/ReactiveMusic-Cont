@@ -8,9 +8,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
@@ -167,11 +168,11 @@ public class ModConfig {
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (super.mouseClicked(mouseX, mouseY, button)) {
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+            if (super.mouseClicked(event, doubled)) {
                 return true;
             }
-            return selectRowAt(mouseX, mouseY);
+            return selectRowAt(event.x(), event.y());
         }
 
         @Override
@@ -187,29 +188,29 @@ public class ModConfig {
         }
 
         @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            this.renderBackground(graphics, mouseX, mouseY, delta);
-            renderContent(graphics);
-            super.render(graphics, mouseX, mouseY, delta);
+        public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+            this.extractBackground(context, mouseX, mouseY, delta);
+            renderContent(context);
+            super.extractRenderState(context, mouseX, mouseY, delta);
         }
 
-        private void renderContent(GuiGraphics graphics) {
+        private void renderContent(GuiGraphicsExtractor context) {
             int centerX = this.width / 2;
             int controlLabelX = Math.max(20, centerX - 160);
 
-            graphics.drawCenteredString(this.font, this.title, centerX, 16, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal("Music Delay Length"), controlLabelX, 47, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal("Music Switch Speed"), controlLabelX, 73, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal("Debug Mode Enabled"), controlLabelX, 99, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal("Songpacks"), listLeft(), 144, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal("Details"), detailsLeft(), 144, LABEL_COLOR);
-            graphics.drawString(this.font, Component.literal(pageLabel()), centerX - this.font.width(pageLabel()) / 2, this.height - 44, MUTED_COLOR);
+            context.centeredText(this.font, this.title, centerX, 16, LABEL_COLOR);
+            context.text(this.font, Component.literal("Music Delay Length"), controlLabelX, 47, LABEL_COLOR);
+            context.text(this.font, Component.literal("Music Switch Speed"), controlLabelX, 73, LABEL_COLOR);
+            context.text(this.font, Component.literal("Debug Mode Enabled"), controlLabelX, 99, LABEL_COLOR);
+            context.text(this.font, Component.literal("Songpacks"), listLeft(), 144, LABEL_COLOR);
+            context.text(this.font, Component.literal("Details"), detailsLeft(), 144, LABEL_COLOR);
+            context.text(this.font, Component.literal(pageLabel()), centerX - this.font.width(pageLabel()) / 2, this.height - 44, MUTED_COLOR);
 
-            renderSongpackRows(graphics);
-            renderDetails(graphics);
+            renderSongpackRows(context);
+            renderDetails(context);
         }
 
-        private void renderSongpackRows(GuiGraphics graphics) {
+        private void renderSongpackRows(GuiGraphicsExtractor context) {
             int left = listLeft();
             int right = listRight();
             int rowTextRight = right - 86;
@@ -221,20 +222,20 @@ public class ModConfig {
                 SongpackZip songpack = RMSongpackLoader.availableSongpacks.get(i);
                 int y = SONGPACK_START_Y + (i - start) * ROW_HEIGHT;
                 if (i == selectedIndex) {
-                    graphics.fill(left - 4, y - 3, right, y + ROW_HEIGHT - 5, SELECTED_BG);
+                    context.fill(left - 4, y - 3, right, y + ROW_HEIGHT - 5, SELECTED_BG);
                 }
                 RowText row = rowText(songpack);
-                graphics.drawString(this.font, fit((i == selectedIndex ? "> " : "  ") + row.name, rowTextRight - left), left, y, row.color);
-                graphics.drawString(this.font, fit(row.detail, rowTextRight - left), left + 10, y + 12, row.detailColor);
+                context.text(this.font, fit((i == selectedIndex ? "> " : "  ") + row.name, rowTextRight - left), left, y, row.color);
+                context.text(this.font, fit(row.detail, rowTextRight - left), left + 10, y + 12, row.detailColor);
             }
         }
 
-        private void renderDetails(GuiGraphics graphics) {
+        private void renderDetails(GuiGraphicsExtractor context) {
             int left = detailsLeft();
             int right = detailsRight();
             int top = SONGPACK_START_Y - 4;
             int bottom = detailsBottom();
-            drawPanel(graphics, left, top, right, bottom);
+            drawPanel(context, left, top, right, bottom);
 
             List<FormattedCharSequence> lines = detailsLines(right - left - 16);
             int visibleLines = Math.max(1, (bottom - top - 16) / 10);
@@ -243,22 +244,22 @@ public class ModConfig {
             int y = top + 8;
             int end = Math.min(lines.size(), detailsScroll + visibleLines);
             for (int i = detailsScroll; i < end; i++) {
-                graphics.drawString(this.font, lines.get(i), left + 8, y, LABEL_COLOR);
+                context.text(this.font, lines.get(i), left + 8, y, LABEL_COLOR);
                 y += 10;
             }
 
             if (lines.size() > visibleLines) {
                 String scroll = "Scroll " + (detailsScroll + 1) + " / " + (maxDetailsScroll(lines, visibleLines) + 1);
-                graphics.drawString(this.font, Component.literal(scroll), right - 8 - this.font.width(scroll), bottom - 12, MUTED_COLOR);
+                context.text(this.font, Component.literal(scroll), right - 8 - this.font.width(scroll), bottom - 12, MUTED_COLOR);
             }
         }
 
-        private void drawPanel(GuiGraphics graphics, int left, int top, int right, int bottom) {
-            graphics.fill(left, top, right, bottom, PANEL_BG);
-            graphics.fill(left, top, right, top + 1, PANEL_BORDER);
-            graphics.fill(left, bottom - 1, right, bottom, PANEL_BORDER);
-            graphics.fill(left, top, left + 1, bottom, PANEL_BORDER);
-            graphics.fill(right - 1, top, right, bottom, PANEL_BORDER);
+        private void drawPanel(GuiGraphicsExtractor context, int left, int top, int right, int bottom) {
+            context.fill(left, top, right, bottom, PANEL_BG);
+            context.fill(left, top, right, top + 1, PANEL_BORDER);
+            context.fill(left, bottom - 1, right, bottom, PANEL_BORDER);
+            context.fill(left, top, left + 1, bottom, PANEL_BORDER);
+            context.fill(right - 1, top, right, bottom, PANEL_BORDER);
         }
 
         private boolean scrollDetails(double mouseX, double mouseY, double amount) {

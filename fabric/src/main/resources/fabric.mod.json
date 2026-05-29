@@ -1,40 +1,32 @@
 {
-	"schemaVersion": 1,
-	"id": "${id}",
-	"version": "${version}",
-	"name": "Reactive Music Cont",
-	"description": "Refactors Minecraft's music to be dynamic and reactive, including new fantasy and celtic tracks to give an air of adventure.",
-	"authors": [
-		"CircuitLord"
-	],
-	"contact": {
-		"homepage": "https://github.com/KevBelisle/ReactiveMusic-Cont",
-		"sources": "https://github.com/KevBelisle/ReactiveMusic-Cont"
-	},
-	"license": "GPLv3",
-	"icon": "assets/reactivemusic/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"circuitlord.reactivemusic.fabric.ReactiveMusicFabric"
-		],
-		"modmenu": [
-			"circuitlord.reactivemusic.fabric.ModMenuIntegration"
-		]
-	},
-	"mixins": [
-		"reactivemusic-common.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.18.4",
-		"minecraft": ">=26.1 <26.2",
-		"java": ">=25"
-	},
-	"custom": {
-		"modmenu": {
-			"links": {
-				"modmenu.discord": "https://discord.gg/vJ6BCjPR3R"
-			}
-		}
-	}
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "Reactive Music Cont",
+  "description": "Refactors Minecraft's music to be dynamic and reactive, including new fantasy and celtic tracks to give an air of adventure.\nOriginal work by CircuitLord, ported to Minecraft 26.x by ImaKlutz.",
+  "authors": ["CircuitLord", "ImaKlutz"],
+  "contact": {
+    "homepage": "https://github.com/KevBelisle/ReactiveMusic-Cont",
+    "sources": "https://github.com/KevBelisle/ReactiveMusic-Cont"
+  },
+  "license": "GPLv3",
+  "icon": "assets/reactivemusic/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["circuitlord.reactivemusic.fabric.ReactiveMusicFabric"],
+    "modmenu": ["circuitlord.reactivemusic.fabric.ModMenuIntegration"]
+  },
+  "mixins": ["reactivemusic-common.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": ">=26.1 <26.2",
+    "java": ">=25"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/vJ6BCjPR3R"
+      }
+    }
+  }
 }

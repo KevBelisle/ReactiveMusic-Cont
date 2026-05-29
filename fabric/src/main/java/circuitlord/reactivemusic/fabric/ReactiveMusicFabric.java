@@ -4,7 +4,7 @@ import circuitlord.reactivemusic.ReactiveMusic;
 import circuitlord.reactivemusic.SongPicker;
 import circuitlord.reactivemusic.config.ModConfig;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,7 +17,7 @@ public class ReactiveMusicFabric implements ClientModInitializer {
         ReactiveMusic.init();
         ReactiveMusic.initClient();
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("reactivemusic")
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("reactivemusic")
                 .executes(context -> {
                     Minecraft mc = context.getSource().getClient();
                     Screen screen = ModConfig.createScreen(mc.screen);
@@ -25,21 +25,21 @@ public class ReactiveMusicFabric implements ClientModInitializer {
                     return 1;
                 })
 
-                .then(ClientCommandManager.literal("logBlockCounter")
+                .then(ClientCommands.literal("logBlockCounter")
                         .executes(context -> {
                             SongPicker.queuedToPrintBlockCounter = true;
                             return 1;
                         })
                 )
 
-                .then(ClientCommandManager.literal("toggleSoundEventLogging")
+                .then(ClientCommands.literal("toggleSoundEventLogging")
                         .executes(context -> {
                             ReactiveMusic.printSoundEvents = !ReactiveMusic.printSoundEvents;
                             return 1;
                         })
                 )
 
-                .then(ClientCommandManager.literal("blacklistDimension")
+                .then(ClientCommands.literal("blacklistDimension")
                         .executes(context -> {
                             String key = context.getSource().getClient().level.dimension().identifier().toString();
 
@@ -55,7 +55,7 @@ public class ReactiveMusicFabric implements ClientModInitializer {
                         })
                 )
 
-                .then(ClientCommandManager.literal("unblacklistDimension")
+                .then(ClientCommands.literal("unblacklistDimension")
                         .executes(context -> {
                             String key = context.getSource().getClient().level.dimension().identifier().toString();
 
@@ -71,7 +71,7 @@ public class ReactiveMusicFabric implements ClientModInitializer {
                         })
                 )
 
-                .then(ClientCommandManager.literal("toggleLogging")
+                .then(ClientCommands.literal("toggleLogging")
                         .executes(context -> {
                             ReactiveMusic.chatLoggingEnabled = !ReactiveMusic.chatLoggingEnabled;
                             context.getSource().sendFeedback(Component.literal("[ReactiveMusic]: Logging enabled: " + ReactiveMusic.chatLoggingEnabled));

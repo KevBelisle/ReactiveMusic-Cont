@@ -22,16 +22,26 @@ dependencies {
 
 	api "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-	implementation("maven.modrinth:yacl:${project.yacl_version}") {
-		exclude(group: "net.fabricmc.fabric-api")
+	// YACL removed: replaced with VanillaConfigScreen
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir "fabric/src/main/java"
+		}
+		resources {
+			srcDir "fabric/src/main/resources"
+		}
 	}
 }
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "id", project.mod_id
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": project.version, "id": project.mod_id
 	}
 }
 
