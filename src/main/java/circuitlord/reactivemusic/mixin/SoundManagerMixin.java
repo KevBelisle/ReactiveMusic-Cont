@@ -6,6 +6,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +24,17 @@ public class SoundManagerMixin {
 
         if (mc.player != null && ReactiveMusic.printSoundEvents) {
             mc.player.sendSystemMessage(Component.literal("[ReactiveMusic]: Sound: " + path + " Attenuation: " + soundInstance.getAttenuation()));
+        }
+
+        // Suppress vanilla music. Cancelling MusicManager.tick() blocks the normal
+        // situational-music path, but some music -- notably in the End dimension --
+        // still reaches the SoundManager through other code paths and plays over our
+        // custom music. Block any MUSIC-category sound here as a backstop.
+        // Our own tracks play through a separate audio device (not the SoundManager)
+        // and music discs use the RECORDS category, so neither is affected.
+        if (soundInstance.getSource() == SoundSource.MUSIC) {
+            cir.setReturnValue(null);
+            return;
         }
 
         if (path.contains("music_disc")) {

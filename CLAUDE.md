@@ -165,7 +165,7 @@ Changes beyond the Yarn→Mojang rename that tools won't catch:
 
 | Mixin | Target | Notes |
 |---|---|---|
-| `SoundManagerMixin` | `net.minecraft.client.sounds.SoundManager` | Injects into `play(SoundInstance)` returning `SoundEngine.PlayResult`; cancels vanilla music sounds |
+| `SoundManagerMixin` | `net.minecraft.client.sounds.SoundManager` | Injects into `play(SoundInstance)` returning `SoundEngine.PlayResult`; cancels vanilla `MUSIC`-category sounds (backstop for music that bypasses `MusicManager.tick()`, e.g. in the End) and tracks duck-triggering sounds (music discs, configured sounds) |
 | `BossBarHudAccessor` | `net.minecraft.client.gui.components.BossHealthOverlay` | `@Accessor("bossBars")` returns `Map<UUID, LerpingBossEvent>` |
 | `MusicManagerMixin` | `net.minecraft.client.sounds.MusicManager` | Cancels `tick()` to suppress vanilla music |
 
