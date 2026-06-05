@@ -49,6 +49,7 @@ public final class SongPicker {
 
     public static String currentBiomeName = "";
     public static String currentDimName = "";
+    public static Set<String> currentBossNames = new HashSet<>();
 
 
     private static final Random rand = new Random();
@@ -234,6 +235,7 @@ public final class SongPicker {
 
         // try to get boss bars
         boolean bossBarActive = false;
+        currentBossNames = new HashSet<>();
 
         if (mc.gui != null && mc.gui.getBossOverlay() != null) {
             try {
@@ -242,6 +244,9 @@ public final class SongPicker {
 
                 if (!bossBars.isEmpty()) {
                     bossBarActive = true;
+                    for (var bossEvent : bossBars.values()) {
+                        currentBossNames.add(bossEvent.getName().getString());
+                    }
                 }
             } catch (Exception e) {
             }
@@ -478,8 +483,18 @@ public final class SongPicker {
                 }
             }
 
+            boolean bossNamesValid = false;
+            for (var bossName : condition.bossNames) {
+                for (var activeName : currentBossNames) {
+                    if (activeName.contains(bossName)) {
+                        bossNamesValid = true;
+                        break;
+                    }
+                }
+                if (bossNamesValid) break;
+            }
 
-            if (!songpackEventsValid && !biomeTypesValid && !biomeTagsValid && !dimsValid && !blocksValid) {
+            if (!songpackEventsValid && !biomeTypesValid && !biomeTagsValid && !dimsValid && !blocksValid && !bossNamesValid) {
                 // none of the OR conditions were valid on this condition, return false
                 return false;
             }

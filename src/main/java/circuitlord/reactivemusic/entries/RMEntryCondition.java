@@ -17,6 +17,8 @@ public class RMEntryCondition {
 
     public List<String> dimTypes = new ArrayList<>();
 
+    public List<String> bossNames = new ArrayList<>();
+
     public List<TagKey<Biome>> biomeTags = new ArrayList<>();
 
     public List<RMEntryBlockCondition> blocks = new ArrayList<>();
