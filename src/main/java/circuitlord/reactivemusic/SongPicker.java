@@ -82,7 +82,7 @@ public final class SongPicker {
 
 
         songpackEventMap.put(SongpackEventType.MAIN_MENU, player == null || world == null);
-        songpackEventMap.put(SongpackEventType.CREDITS, mc.screen instanceof WinScreen);
+        songpackEventMap.put(SongpackEventType.CREDITS, mc.gui.screen() instanceof WinScreen);
 
         // Early out if not in-game
         if (player == null || world == null) return;
@@ -235,10 +235,10 @@ public final class SongPicker {
         // try to get boss bars
         boolean bossBarActive = false;
 
-        if (mc.gui != null && mc.gui.getBossOverlay() != null) {
+        if (mc.gui != null && mc.gui.hud.getBossOverlay() != null) {
             try {
 
-                var bossBars = ((BossBarHudAccessor) mc.gui.getBossOverlay()).getBossBars();
+                var bossBars = ((BossBarHudAccessor) mc.gui.hud.getBossOverlay()).getBossBars();
 
                 if (!bossBars.isEmpty()) {
                     bossBarActive = true;

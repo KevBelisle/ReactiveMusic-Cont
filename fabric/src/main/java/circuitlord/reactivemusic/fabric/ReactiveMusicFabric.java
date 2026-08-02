@@ -20,8 +20,8 @@ public class ReactiveMusicFabric implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("reactivemusic")
                 .executes(context -> {
                     Minecraft mc = context.getSource().getClient();
-                    Screen screen = ModConfig.createScreen(mc.screen);
-                    mc.execute(() -> mc.setScreen(screen));
+                    Screen screen = ModConfig.createScreen(mc.gui.screen());
+                    mc.execute(() -> mc.gui.setScreen(screen));
                     return 1;
                 })
 

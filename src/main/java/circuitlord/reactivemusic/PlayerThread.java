@@ -139,10 +139,10 @@ public class PlayerThread extends Thread {
 
 		// Try to find the music options menu
 		TranslatableContents ScreenTitleContent = null;
-		if (client.screen != null && client.screen.getTitle() != null && client.screen.getTitle().getContents() != null
-			&& client.screen.getTitle().getContents() instanceof TranslatableContents) {
+		if (client.gui.screen() != null && client.gui.screen().getTitle() != null && client.gui.screen().getTitle().getContents() != null
+			&& client.gui.screen().getTitle().getContents() instanceof TranslatableContents) {
 
-			ScreenTitleContent = (TranslatableContents) client.screen.getTitle().getContents();
+			ScreenTitleContent = (TranslatableContents) client.gui.screen().getTitle().getContents();
 
 			if (ScreenTitleContent != null) {
 				musicOptionsOpen = ScreenTitleContent.getKey().equals("options.sounds.title");

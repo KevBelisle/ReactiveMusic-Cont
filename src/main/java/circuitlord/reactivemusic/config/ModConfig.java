@@ -116,7 +116,7 @@ public class ModConfig {
                 config.debugModeEnabled = !config.debugModeEnabled;
                 saveConfig();
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
                 }
             }));
 
@@ -141,7 +141,7 @@ public class ModConfig {
                     detailsScroll = 0;
                     setActiveSongpack(songpack);
                     if (this.minecraft != null) {
-                        this.minecraft.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
+                        this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
                     }
                 });
                 loadButton.active = !failed && !loaded;
@@ -150,7 +150,7 @@ public class ModConfig {
 
             Button prev = button(centerX - 154, this.height - 28, 70, BUTTON_HEIGHT, Component.literal("Previous"), b -> {
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page - 1, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page - 1, selectedIndex));
                 }
             });
             prev.active = page > 0;
@@ -160,7 +160,7 @@ public class ModConfig {
 
             Button next = button(centerX + 84, this.height - 28, 70, BUTTON_HEIGHT, Component.literal("Next"), b -> {
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page + 1, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page + 1, selectedIndex));
                 }
             });
             next.active = page + 1 < pages;
@@ -183,7 +183,7 @@ public class ModConfig {
         @Override
         public void onClose() {
             if (this.minecraft != null) {
-                this.minecraft.setScreen(parent);
+                this.minecraft.gui.setScreen(parent);
             }
         }
 
