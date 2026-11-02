@@ -6,6 +6,7 @@ import circuitlord.reactivemusic.SongpackZip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+import com.mojang.blaze3d.Blaze3D;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
@@ -487,7 +487,7 @@ public class ModConfig {
             Path path = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
             try {
                 Files.createDirectories(path);
-                Util.getPlatform().openFile(path.toFile());
+                Blaze3D.openPath(path);
             } catch (IOException e) {
                 ReactiveMusic.LOGGER.error("Failed to open songpack folder", e);
             }
