@@ -6,6 +6,7 @@ import circuitlord.reactivemusic.SongpackZip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+import com.mojang.blaze3d.Blaze3D;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
@@ -116,7 +116,7 @@ public class ModConfig {
                 config.debugModeEnabled = !config.debugModeEnabled;
                 saveConfig();
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
                 }
             }));
 
@@ -141,7 +141,7 @@ public class ModConfig {
                     detailsScroll = 0;
                     setActiveSongpack(songpack);
                     if (this.minecraft != null) {
-                        this.minecraft.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
+                        this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page, selectedIndex));
                     }
                 });
                 loadButton.active = !failed && !loaded;
@@ -150,7 +150,7 @@ public class ModConfig {
 
             Button prev = button(centerX - 154, this.height - 28, 70, BUTTON_HEIGHT, Component.literal("Previous"), b -> {
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page - 1, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page - 1, selectedIndex));
                 }
             });
             prev.active = page > 0;
@@ -160,7 +160,7 @@ public class ModConfig {
 
             Button next = button(centerX + 84, this.height - 28, 70, BUTTON_HEIGHT, Component.literal("Next"), b -> {
                 if (this.minecraft != null) {
-                    this.minecraft.setScreen(new VanillaConfigScreen(parent, page + 1, selectedIndex));
+                    this.minecraft.gui.setScreen(new VanillaConfigScreen(parent, page + 1, selectedIndex));
                 }
             });
             next.active = page + 1 < pages;
@@ -183,7 +183,7 @@ public class ModConfig {
         @Override
         public void onClose() {
             if (this.minecraft != null) {
-                this.minecraft.setScreen(parent);
+                this.minecraft.gui.setScreen(parent);
             }
         }
 
@@ -487,7 +487,7 @@ public class ModConfig {
             Path path = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
             try {
                 Files.createDirectories(path);
-                Util.getPlatform().openFile(path.toFile());
+                Blaze3D.openPath(path);
             } catch (IOException e) {
                 ReactiveMusic.LOGGER.error("Failed to open songpack folder", e);
             }
