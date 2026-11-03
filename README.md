@@ -6,4 +6,4 @@ Discord: https://discord.gg/vJ6BCjPR3R
 
 ## Note on the 26.2 / 26.3 updates
 
-The Minecraft 26.2 and 26.3 ports in this fork were produced with AI assistance (via OpenCode) under human review and verification. Original work by CircuitLord; Minecraft 26.x porting by ImaKlutz.
+The Minecraft 26.2 and 26.3 ports in this fork were produced with AI assistance (via OpenCode) under human review and verification. Original work by CircuitLord; Minecraft 26.1 porting by ImaKlutz.
